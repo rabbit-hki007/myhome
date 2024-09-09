@@ -1,0 +1,42 @@
+=====================================
+CREATE TABLE BOARD (
+    ID NUMBER GENERATED ALWAYS AS IDENTITY,
+    title VARCHAR2(100),
+    CONTENT VARCHAR(500)
+);
+
+
+
+DROP sequence boardtest_seq;
+DROP TABLE board;
+
+
+CREATE SEQUENCE boardtest_seq
+START WITH 1 -- 시작 번호
+INCREMENT BY 1 -- 증가 값
+CACHE 20; -- 여러명이 동시에 번호생성이 NOCashe로 하는 경우 번호가 건너 뜨워질수 잇음
+
+CREATE TABLE board (
+    id NUMBER PRIMARY KEY,
+    title VARCHAR2(50),
+    content VARCHAR2(500)
+);
+
+-- 이것은 id 시퀀스를 자동증가시기기 위한 trigger이기는 하지만
+-- Board Model의 
+-- @SequenceGenerator(name = "boardtest_seq", sequenceName = "boardtest_seq", allocationSize = 1) //sequece 증가시키기
+-- 위의 것과 함께 사용하면 id 값이 2,4,6,8 이런식으로 번호가 생김 
+-- @SequenceGenerator를 사용안하면 아래처럼 트리거로 만들어도 된다
+CREATE OR REPLACE TRIGGER trg_board_id
+BEFORE INSERT ON board
+FOR EACH ROW
+BEGIN
+    :NEW.id := boardtest_seq.NEXTVAL;
+END;
+
+COMMIT;
+SELECT * FROM BOARD;
+
+DELETE FROM BOARD;
+
+COMMIT;
